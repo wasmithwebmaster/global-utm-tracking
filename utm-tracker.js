@@ -1,5 +1,5 @@
 // Store source link in session storage when the page loads
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
   if (!sessionStorage.getItem('originalSource')) {
     sessionStorage.setItem('originalSource', document.referrer || window.location.href);
   }
@@ -22,60 +22,50 @@ document.addEventListener('DOMContentLoaded', function () {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
   }
 
-  // Helper to safely read stored UTM params as an object
-  function getStoredUTMObject() {
-    const raw = sessionStorage.getItem('utmParams');
-    if (!raw) return {};
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch (e) {
-      return {};
-    }
-  }
-
   // Function to populate hidden fields
   function populateHiddenFields(form) {
-    const isContentPath = window.location.pathname.indexOf('/content') !== -1;
-
-    // Field mappings: internal key -> [actual input name(s) to look for]
-    // If not found, the first name in the array is used when creating.
     const fieldMappings = {
       'Page_Name': ['Page-Converted'],
-      'guide_name': ['Download-Requested'], // will be conditional below
+      'guide_name': ['Download-Requested'],
       'Source_Link': ['Source-Link'],
       'UTM_Parameters': ['Campaign-Information'],
 
-      // New individual UTM mappings
-      'campaign_source': ['campaign_source'],
-      'campaign_medium': ['campaign_medium'],
-      'campaign_name': ['campaign_name'],
-      'campaign_term': ['campaign_term'],
-      'campaign_content': ['campaign_content']
+      // NEW: map individual UTM values to separate hidden fields
+      'utm_source': ['campaign_source'],
+      'utm_medium': ['campaign_medium'],
+      'utm_campaign': ['campaign_name'],
+      'utm_term': ['campaign_term'],
+      'utm_content': ['campaign_content']
     };
 
-    const storedUtmObj = getStoredUTMObject();
+    const storedUTMParamsRaw = sessionStorage.getItem('utmParams') || '';
+    let storedUTMParamsObj = {};
+    if (storedUTMParamsRaw) {
+      try {
+        storedUTMParamsObj = JSON.parse(storedUTMParamsRaw) || {};
+      } catch (e) {
+        storedUTMParamsObj = {};
+      }
+    }
 
     const fields = {
       'Page_Name': document.title || window.location.pathname,
-      // Only set guide_name when /content is in the URL path
-      'guide_name': isContentPath ? (document.title || window.location.pathname) : null,
+      'guide_name': document.title || window.location.pathname,
       'Source_Link': sessionStorage.getItem('originalSource') || '',
-      'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
+      'UTM_Parameters': storedUTMParamsRaw || '',
 
-      // New individual UTM values (empty string if missing)
-      'campaign_source': storedUtmObj.utm_source || '',
-      'campaign_medium': storedUtmObj.utm_medium || '',
-      'campaign_name': storedUtmObj.utm_campaign || '',
-      'campaign_term': storedUtmObj.utm_term || '',
-      'campaign_content': storedUtmObj.utm_content || ''
+      // NEW: populate from stored utmParams (if present)
+      'utm_source': storedUTMParamsObj.utm_source || '',
+      'utm_medium': storedUTMParamsObj.utm_medium || '',
+      'utm_campaign': storedUTMParamsObj.utm_campaign || '',
+      'utm_term': storedUTMParamsObj.utm_term || '',
+      'utm_content': storedUTMParamsObj.utm_content || ''
     };
 
-    Object.keys(fieldMappings).forEach(fieldKey => {
-      // Skip Download-Requested entirely unless /content is in the URL
-      if (fieldKey === 'guide_name' && !isContentPath) return;
+    const isContentPath = window.location.pathname.indexOf('/content') !== -1;
 
-      const possibleNames = fieldMappings[fieldKey];
+    Object.keys(fieldMappings).forEach(fieldName => {
+      const possibleNames = fieldMappings[fieldName];
       let field = null;
 
       for (let name of possibleNames) {
@@ -83,19 +73,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (field) break;
       }
 
-      const value = fields[fieldKey];
-
-      // If value is null/undefined, do not create/populate
-      if (value === null || value === undefined) return;
+      // NEW: conditional Download-Requested behavior
+      if (fieldName === 'guide_name' && !isContentPath) {
+        // Safest approach: remove the input if it exists, otherwise do not create it.
+        if (field) field.remove();
+        return;
+      }
 
       if (field) {
-        field.value = value;
+        field.value = fields[fieldName];
       } else {
         // If field doesn't exist, create it
         field = document.createElement('input');
         field.type = 'hidden';
         field.name = possibleNames[0];
-        field.value = value;
+        field.value = fields[fieldName];
         form.appendChild(field);
       }
     });
