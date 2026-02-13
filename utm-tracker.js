@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const utmParams = getUTMParameters();
   if (Object.keys(utmParams).length > 0) {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
+    // Store individual UTM parameters
+    sessionStorage.setItem('utm_campaign', utmParams.utm_campaign || '');
+    sessionStorage.setItem('utm_source', utmParams.utm_source || '');
+    sessionStorage.setItem('utm_medium', utmParams.utm_medium || '');
+    sessionStorage.setItem('utm_content', utmParams.utm_content || '');
+    sessionStorage.setItem('utm_term', utmParams.utm_term || '');
   }
   // Function to populate hidden fields
   function populateHiddenFields(form) {
-    // Parse stored UTM parameters
-    const storedUtmParams = sessionStorage.getItem('utmParams') ? JSON.parse(sessionStorage.getItem('utmParams')) : {};
-    
     const fieldMappings = {
       'Page_Name': ['Page-Converted'],
       'guide_name': ['Download-Requested'],
@@ -35,19 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
       'Campaign_Content': ['Campaign-Content'],
       'Campaign_Term': ['Campaign-Term']
     };
-    
     const fields = {
       'Page_Name': document.title || window.location.pathname,
       'guide_name': document.title || window.location.pathname,
       'Source_Link': sessionStorage.getItem('originalSource') || '',
       'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
-      'Campaign_Name': storedUtmParams.utm_campaign || '',
-      'Campaign_Source': storedUtmParams.utm_source || '',
-      'Campaign_Medium': storedUtmParams.utm_medium || '',
-      'Campaign_Content': storedUtmParams.utm_content || '',
-      'Campaign_Term': storedUtmParams.utm_term || ''
+      'Campaign_Name': sessionStorage.getItem('utm_campaign') || '',
+      'Campaign_Source': sessionStorage.getItem('utm_source') || '',
+      'Campaign_Medium': sessionStorage.getItem('utm_medium') || '',
+      'Campaign_Content': sessionStorage.getItem('utm_content') || '',
+      'Campaign_Term': sessionStorage.getItem('utm_term') || ''
     };
-    
     Object.keys(fieldMappings).forEach(fieldName => {
       const possibleNames = fieldMappings[fieldName];
       let field = null;
