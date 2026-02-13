@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!sessionStorage.getItem('originalSource')) {
     sessionStorage.setItem('originalSource', document.referrer || window.location.href);
   }
-
   // Get UTM parameters
   function getUTMParameters() {
     const utmParams = {};
@@ -15,29 +14,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     return utmParams;
   }
-
   // Store UTM parameters in session storage
   const utmParams = getUTMParameters();
   if (Object.keys(utmParams).length > 0) {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
   }
-
   // Function to populate hidden fields
   function populateHiddenFields(form) {
     const fieldMappings = {
       'Page_Name': ['Page-Converted'],
       'guide_name': ['Download-Requested'],
       'Source_Link': ['Source-Link'],
-      'UTM_Parameters': ['Campaign-Information']
+      'UTM_Parameters': ['Campaign-Information'],
+      'Campaign_Name': ['Campaign-Name'],
+      'Campaign_Source': ['Campaign-Source'],
+      'Campaign_Medium': ['Campaign-Medium'],
+      'Campaign_Content': ['Campaign-Content'],
+      'Campaign_Term': ['Campaign-Term']
     };
-
+    
+    // Parse stored UTM parameters
+    const storedUtmParams = sessionStorage.getItem('utmParams') ? JSON.parse(sessionStorage.getItem('utmParams')) : {};
+    
     const fields = {
       'Page_Name': document.title || window.location.pathname,
       'guide_name': document.title || window.location.pathname,
       'Source_Link': sessionStorage.getItem('originalSource') || '',
-      'UTM_Parameters': sessionStorage.getItem('utmParams') || ''
+      'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
+      'Campaign_Name': storedUtmParams.utm_campaign || '',
+      'Campaign_Source': storedUtmParams.utm_source || '',
+      'Campaign_Medium': storedUtmParams.utm_medium || '',
+      'Campaign_Content': storedUtmParams.utm_content || '',
+      'Campaign_Term': storedUtmParams.utm_term || ''
     };
-
     Object.keys(fieldMappings).forEach(fieldName => {
       const possibleNames = fieldMappings[fieldName];
       let field = null;
@@ -57,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
   // Populate hidden fields for all forms
   document.querySelectorAll('form').forEach(populateHiddenFields);
 });
