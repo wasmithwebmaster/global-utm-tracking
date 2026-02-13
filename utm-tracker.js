@@ -93,6 +93,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Populate hidden fields for all forms
-  document.querySelectorAll('form').forEach(populateHiddenFields);
+  // NEW: initialize forms safely, including forms injected after DOMContentLoaded
+  function initForm(form) {
+    if (!form || form.nodeName !== 'FORM') return;
+
+    // Avoid duplicate listeners and duplicate work per form
+    if (form.dataset && form.dataset.hiddenFieldInit === '1') return;
+    if (form.dataset) form.dataset.hiddenFieldInit = '1';
+
+    populateHiddenFields(form);
+
+    // Ensure fields exist and are current at the moment of submission (timing-safe)
+    form.addEventListener('submit', function() {
+      populateHiddenFields(form);
+    });
+  }
+
+  // Populate hidden fields for all current forms
+  document.querySelectorAll('form').forEach(initForm);
+
+  // Watch for forms that appear later (Webflow interactions, conditional embeds, etc.)
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (!node || node.nodeType !== 1) return;
+
+        if (node.nodeName === 'FORM') {
+          initForm(node);
+          return;
+        }
+
+        const nestedForms = node.querySelectorAll ? node.querySelectorAll('form') : [];
+        nestedForms.forEach(initForm);
+      });
+    });
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 });
