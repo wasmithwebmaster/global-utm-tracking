@@ -1,96 +1,121 @@
-// Store source link in session storage when the page loads
-document.addEventListener('DOMContentLoaded', function() {
-  if (!sessionStorage.getItem('originalSource')) {
-    sessionStorage.setItem('originalSource', document.referrer || window.location.href);
-  }
+<script>
+(() => {
+  'use strict';
 
-  // Get UTM parameters
-  function getUTMParameters() {
-    const utmParams = {};
-    const params = new URLSearchParams(window.location.search);
-    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(param => {
-      if (params.has(param)) {
-        utmParams[param] = params.get(param);
+  document.addEventListener('DOMContentLoaded', () => {
+    // Store landing page as Source Link once per session
+    if (!sessionStorage.getItem('originalSource')) {
+      sessionStorage.setItem('originalSource', window.location.href);
+    }
+
+    // Initialize session timestamps
+    if (!sessionStorage.getItem('first_seen_ts')) {
+      sessionStorage.setItem('first_seen_ts', new Date().toISOString());
+    }
+
+    // Read UTM parameters from the current URL
+    const getUTMParameters = () => {
+      const params = new URLSearchParams(window.location.search);
+      const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+      const result = {};
+
+      keys.forEach((key) => {
+        result[key] = params.get(key) || '';
+      });
+
+      return result;
+    };
+
+    // Persist UTMs to session storage (set only if present, do not overwrite existing session values)
+    const utmParams = getUTMParameters();
+    Object.keys(utmParams).forEach((key) => {
+      const value = utmParams[key];
+      if (value && !sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, value);
       }
     });
-    return utmParams;
-  }
 
-  // Store UTM parameters in session storage (combined JSON)
-  const utmParams = getUTMParameters();
-  if (Object.keys(utmParams).length > 0) {
-    sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
-  }
-
-  // ALWAYS store individual UTM parameters (even if empty) – this is what enables persistence
-  const params = new URLSearchParams(window.location.search);
-  if (!sessionStorage.getItem('utm_campaign')) {
-    sessionStorage.setItem('utm_campaign', params.get('utm_campaign') || '');
-  }
-  if (!sessionStorage.getItem('utm_source')) {
-    sessionStorage.setItem('utm_source', params.get('utm_source') || '');
-  }
-  if (!sessionStorage.getItem('utm_medium')) {
-    sessionStorage.setItem('utm_medium', params.get('utm_medium') || '');
-  }
-  if (!sessionStorage.getItem('utm_content')) {
-    sessionStorage.setItem('utm_content', params.get('utm_content') || '');
-  }
-  if (!sessionStorage.getItem('utm_term')) {
-    sessionStorage.setItem('utm_term', params.get('utm_term') || '');
-  }
-
-  // Function to populate hidden fields – identical structure to original
-  function populateHiddenFields(form) {
-    const fieldMappings = {
-      'Page_Name': ['Page-Converted'],
-      'guide_name': ['Download-Requested'],
-      'Source_Link': ['Source-Link'],
-      'UTM_Parameters': ['Campaign-Information'],
-      'Campaign_Name': ['Campaign-Name'],
-      'Campaign_Source': ['Campaign-Source'],
-      'Campaign_Medium': ['Campaign-Medium'],
-      'Campaign_Content': ['Campaign-Content'],
-      'Campaign_Term': ['Campaign-Term']
-    };
-
-    const fields = {
-      'Page_Name': document.title || window.location.pathname,
-      'guide_name': document.title || window.location.pathname,
-      'Source_Link': sessionStorage.getItem('originalSource') || '',
-      'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
-      'Campaign_Name': sessionStorage.getItem('utm_campaign') || '',
-      'Campaign_Source': sessionStorage.getItem('utm_source') || '',
-      'Campaign_Medium': sessionStorage.getItem('utm_medium') || '',
-      'Campaign_Content': sessionStorage.getItem('utm_content') || '',
-      'Campaign_Term': sessionStorage.getItem('utm_term') || ''
-    };
-
-    Object.keys(fieldMappings).forEach(fieldName => {
-      const possibleNames = fieldMappings[fieldName];
-      let field = null;
-      for (let name of possibleNames) {
-        field = form.querySelector(`input[name="${name}"]`);
-        if (field) break;
-      }
-      if (field) {
-        field.value = fields[fieldName];
-      } else {
-        // If field doesn't exist, create it – same as your original code
+    const setOrCreateHiddenField = (form, name, value) => {
+      let field = form.querySelector(`input[name="${name}"]`);
+      if (!field) {
         field = document.createElement('input');
         field.type = 'hidden';
-        field.name = possibleNames[0];
-        field.value = fields[fieldName];
+        field.name = name;
         form.appendChild(field);
       }
+      field.value = value || '';
+    };
+
+    const populateHiddenFields = (form) => {
+      // Existing fields
+      setOrCreateHiddenField(
+        form,
+        'Page-Converted',
+        document.title || window.location.pathname
+      );
+
+      setOrCreateHiddenField(
+        form,
+        'Download-Requested',
+        document.title || window.location.pathname
+      );
+
+      setOrCreateHiddenField(
+        form,
+        'Source-Link',
+        sessionStorage.getItem('originalSource') || ''
+      );
+
+      // UTM fields (always present, sometimes empty)
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach((key) => {
+        setOrCreateHiddenField(
+          form,
+          key,
+          sessionStorage.getItem(key) || ''
+        );
+      });
+
+      // Session timestamps
+      setOrCreateHiddenField(
+        form,
+        'first_seen_ts',
+        sessionStorage.getItem('first_seen_ts') || ''
+      );
+
+      setOrCreateHiddenField(
+        form,
+        'last_seen_ts',
+        sessionStorage.getItem('last_seen_ts') || ''
+      );
+    };
+
+    const attachSubmitHandler = (form) => {
+      // Avoid double binding if scripts run more than once
+      if (form.dataset.utmAuditBound === '1') return;
+      form.dataset.utmAuditBound = '1';
+
+      form.addEventListener('submit', () => {
+        // Timestamp the conversion moment
+        const nowIso = new Date().toISOString();
+        sessionStorage.setItem('last_seen_ts', nowIso);
+
+        // Ensure hidden fields reflect final values at submission time
+        populateHiddenFields(form);
+
+        // Force last_seen_ts to the exact submit-time value
+        setOrCreateHiddenField(form, 'last_seen_ts', nowIso);
+
+        // Optional: If you ever decide Page-Converted should be the actual conversion URL instead of title/path,
+        // swap this line in place of the current Page-Converted assignment above:
+        // setOrCreateHiddenField(form, 'Page-Converted', window.location.href);
+      });
+    };
+
+    // Apply to all forms on the page
+    document.querySelectorAll('form').forEach((form) => {
+      populateHiddenFields(form);
+      attachSubmitHandler(form);
     });
-  }
-
-  // Populate hidden fields for all forms – same as original
-  document.querySelectorAll('form').forEach(populateHiddenFields);
-
-  // Optional safety net – re-init Webflow forms (uncomment if new fields still missing)
-  // if (window.Webflow && Webflow.require) {
-  //   Webflow.require('forms').init();
-  // }
-});
+  });
+})();
+</script>
