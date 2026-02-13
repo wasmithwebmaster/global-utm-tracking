@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
     return utmParams;
   }
 
-  // Store UTM parameters in session storage (as JSON for the combined field)
+  // Store UTM parameters in session storage (combined JSON)
   const utmParams = getUTMParameters();
   if (Object.keys(utmParams).length > 0) {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
   }
 
-  // ALWAYS store individual UTM parameters (even if empty)
+  // ALWAYS store individual UTM parameters (even if empty) – this is what enables persistence
   const params = new URLSearchParams(window.location.search);
   if (!sessionStorage.getItem('utm_campaign')) {
     sessionStorage.setItem('utm_campaign', params.get('utm_campaign') || '');
@@ -40,30 +40,30 @@ document.addEventListener('DOMContentLoaded', function() {
     sessionStorage.setItem('utm_term', params.get('utm_term') || '');
   }
 
-  // Function to populate hidden fields
+  // Function to populate hidden fields – identical structure to original
   function populateHiddenFields(form) {
     const fieldMappings = {
-      'Page_Name':      ['Page-Converted'],
-      'guide_name':     ['Download-Requested'],
-      'Source_Link':    ['Source-Link'],
+      'Page_Name': ['Page-Converted'],
+      'guide_name': ['Download-Requested'],
+      'Source_Link': ['Source-Link'],
       'UTM_Parameters': ['Campaign-Information'],
-      'Campaign_Name':  ['Campaign-Name'],
+      'Campaign_Name': ['Campaign-Name'],
       'Campaign_Source': ['Campaign-Source'],
       'Campaign_Medium': ['Campaign-Medium'],
       'Campaign_Content': ['Campaign-Content'],
-      'Campaign_Term':   ['Campaign-Term']
+      'Campaign_Term': ['Campaign-Term']
     };
 
     const fields = {
-      'Page_Name':      document.title || window.location.pathname,
-      'guide_name':     document.title || window.location.pathname,
-      'Source_Link':    sessionStorage.getItem('originalSource') || '',
+      'Page_Name': document.title || window.location.pathname,
+      'guide_name': document.title || window.location.pathname,
+      'Source_Link': sessionStorage.getItem('originalSource') || '',
       'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
-      'Campaign_Name':  sessionStorage.getItem('utm_campaign') || '',
+      'Campaign_Name': sessionStorage.getItem('utm_campaign') || '',
       'Campaign_Source': sessionStorage.getItem('utm_source') || '',
       'Campaign_Medium': sessionStorage.getItem('utm_medium') || '',
       'Campaign_Content': sessionStorage.getItem('utm_content') || '',
-      'Campaign_Term':   sessionStorage.getItem('utm_term') || ''
+      'Campaign_Term': sessionStorage.getItem('utm_term') || ''
     };
 
     Object.keys(fieldMappings).forEach(fieldName => {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (field) {
         field.value = fields[fieldName];
       } else {
-        // If field doesn't exist, create it
+        // If field doesn't exist, create it – same as your original code
         field = document.createElement('input');
         field.type = 'hidden';
         field.name = possibleNames[0];
@@ -86,6 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Populate hidden fields for all forms
+  // Populate hidden fields for all forms – same as original
   document.querySelectorAll('form').forEach(populateHiddenFields);
+
+  // Optional safety net – re-init Webflow forms (uncomment if new fields still missing)
+  // if (window.Webflow && Webflow.require) {
+  //   Webflow.require('forms').init();
+  // }
 });
