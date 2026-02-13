@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!sessionStorage.getItem('originalSource')) {
     sessionStorage.setItem('originalSource', document.referrer || window.location.href);
   }
+
   // Get UTM parameters
   function getUTMParameters() {
     const utmParams = {};
@@ -14,12 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     return utmParams;
   }
-  // Store UTM parameters in session storage
+
+  // Store UTM parameters in session storage (as JSON for the combined field)
   const utmParams = getUTMParameters();
   if (Object.keys(utmParams).length > 0) {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
   }
-  
+
   // ALWAYS store individual UTM parameters (even if empty)
   const params = new URLSearchParams(window.location.search);
   if (!sessionStorage.getItem('utm_campaign')) {
@@ -37,31 +39,33 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!sessionStorage.getItem('utm_term')) {
     sessionStorage.setItem('utm_term', params.get('utm_term') || '');
   }
-  
+
   // Function to populate hidden fields
   function populateHiddenFields(form) {
     const fieldMappings = {
-      'Page_Name': ['Page-Converted'],
-      'guide_name': ['Download-Requested'],
-      'Source_Link': ['Source-Link'],
+      'Page_Name':      ['Page-Converted'],
+      'guide_name':     ['Download-Requested'],
+      'Source_Link':    ['Source-Link'],
       'UTM_Parameters': ['Campaign-Information'],
-      'Campaign_Name': ['Campaign-Name'],
+      'Campaign_Name':  ['Campaign-Name'],
       'Campaign_Source': ['Campaign-Source'],
       'Campaign_Medium': ['Campaign-Medium'],
       'Campaign_Content': ['Campaign-Content'],
-      'Campaign_Term': ['Campaign-Term']
+      'Campaign_Term':   ['Campaign-Term']
     };
+
     const fields = {
-      'Page_Name': document.title || window.location.pathname,
-      'guide_name': document.title || window.location.pathname,
-      'Source_Link': sessionStorage.getItem('originalSource') || '',
+      'Page_Name':      document.title || window.location.pathname,
+      'guide_name':     document.title || window.location.pathname,
+      'Source_Link':    sessionStorage.getItem('originalSource') || '',
       'UTM_Parameters': sessionStorage.getItem('utmParams') || '',
-      'Campaign_Name': sessionStorage.getItem('utm_campaign') || '',
+      'Campaign_Name':  sessionStorage.getItem('utm_campaign') || '',
       'Campaign_Source': sessionStorage.getItem('utm_source') || '',
       'Campaign_Medium': sessionStorage.getItem('utm_medium') || '',
       'Campaign_Content': sessionStorage.getItem('utm_content') || '',
-      'Campaign_Term': sessionStorage.getItem('utm_term') || ''
+      'Campaign_Term':   sessionStorage.getItem('utm_term') || ''
     };
+
     Object.keys(fieldMappings).forEach(fieldName => {
       const possibleNames = fieldMappings[fieldName];
       let field = null;
@@ -81,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
   // Populate hidden fields for all forms
   document.querySelectorAll('form').forEach(populateHiddenFields);
 });
