@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // Function to populate hidden fields
   function populateHiddenFields(form) {
+    // Parse stored UTM parameters
+    const storedUtmParams = sessionStorage.getItem('utmParams') ? JSON.parse(sessionStorage.getItem('utmParams')) : {};
+    
     const fieldMappings = {
       'Page_Name': ['Page-Converted'],
       'guide_name': ['Download-Requested'],
@@ -33,9 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
       'Campaign_Term': ['Campaign-Term']
     };
     
-    // Parse stored UTM parameters
-    const storedUtmParams = sessionStorage.getItem('utmParams') ? JSON.parse(sessionStorage.getItem('utmParams')) : {};
-    
     const fields = {
       'Page_Name': document.title || window.location.pathname,
       'guide_name': document.title || window.location.pathname,
@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
       'Campaign_Content': storedUtmParams.utm_content || '',
       'Campaign_Term': storedUtmParams.utm_term || ''
     };
+    
     Object.keys(fieldMappings).forEach(fieldName => {
       const possibleNames = fieldMappings[fieldName];
       let field = null;
