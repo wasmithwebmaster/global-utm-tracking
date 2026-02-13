@@ -18,13 +18,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const utmParams = getUTMParameters();
   if (Object.keys(utmParams).length > 0) {
     sessionStorage.setItem('utmParams', JSON.stringify(utmParams));
-    // Store individual UTM parameters
-    sessionStorage.setItem('utm_campaign', utmParams.utm_campaign || '');
-    sessionStorage.setItem('utm_source', utmParams.utm_source || '');
-    sessionStorage.setItem('utm_medium', utmParams.utm_medium || '');
-    sessionStorage.setItem('utm_content', utmParams.utm_content || '');
-    sessionStorage.setItem('utm_term', utmParams.utm_term || '');
   }
+  
+  // ALWAYS store individual UTM parameters (even if empty)
+  const params = new URLSearchParams(window.location.search);
+  if (!sessionStorage.getItem('utm_campaign')) {
+    sessionStorage.setItem('utm_campaign', params.get('utm_campaign') || '');
+  }
+  if (!sessionStorage.getItem('utm_source')) {
+    sessionStorage.setItem('utm_source', params.get('utm_source') || '');
+  }
+  if (!sessionStorage.getItem('utm_medium')) {
+    sessionStorage.setItem('utm_medium', params.get('utm_medium') || '');
+  }
+  if (!sessionStorage.getItem('utm_content')) {
+    sessionStorage.setItem('utm_content', params.get('utm_content') || '');
+  }
+  if (!sessionStorage.getItem('utm_term')) {
+    sessionStorage.setItem('utm_term', params.get('utm_term') || '');
+  }
+  
   // Function to populate hidden fields
   function populateHiddenFields(form) {
     const fieldMappings = {
