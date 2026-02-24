@@ -23,11 +23,12 @@ This document defines the official UTM taxonomy and naming standards for W.A. Sm
 
 Objectives:
 
-- Maintain clean, non-fragmented reporting  
-- Ensure direct Salesforce field mapping without transformations  
-- Preserve acquisition attribution integrity  
-- Prevent taxonomy drift  
-- Create long-term scalability  
+- Eliminate manual attribution decisions in Salesforce by enforcing a locked UTM framework with predefined structures  
+- Remove user-level choice in attribution fields to guarantee system-level consistency and reporting control  
+- Enforce direct Salesforce field mapping without transformations  
+- Protect acquisition attribution integrity across all channels  
+- Prevent taxonomy drift through fixed, governed naming standards
+- Establish a scalable attribution structure that remains stable as marketing expands
 
 This structure is fixed and controlled.
 
