@@ -1,366 +1,320 @@
-# W.A. Smith Financial Group
-
-## UTM Tracking & Campaign Naming Standards
-
+# UTM Taxonomy & Naming Standards  
 Version 1.0
+
+---
+
+## Quick Navigation
+
+- [1. Purpose](#1-purpose)
+- [2. Marketing Funnel Structure](#2-marketing-funnel-structure)
+- [3. Approved utm_medium List](#3-approved-utm_medium-list)
+- [4. Approved utm_source List & Medium Mapping](#4-approved-utm_source-list--medium-mapping)
+- [5. utm_campaign Naming Convention](#5-utm_campaign-naming-convention)
+- [6. utm_content Naming Convention](#6-utm_content-naming-convention)
+- [7. utm_term Naming Convention](#7-utm_term-naming-convention)
+- [8. Global Naming Rules](#8-global-naming-rules)
+- [9. Governance & Enforcement](#9-governance--enforcement)
 
 ---
 
 # 1. Purpose
 
-This document defines the official UTM taxonomy and campaign naming standards for W.A. Smith Financial Group.
+This document defines the official UTM taxonomy and naming standards for W.A. Smith Financial Group.
 
 Objectives:
 
-* Maintain clean, non-fragmented reporting
-* Eliminate inconsistent tagging
-* Ensure direct Salesforce field mapping without transformations
-* Preserve acquisition attribution integrity
-* Create long-term scalability
+- Maintain clean, non-fragmented reporting  
+- Ensure direct Salesforce field mapping without transformations  
+- Preserve acquisition attribution integrity  
+- Prevent taxonomy drift  
+- Create long-term scalability  
 
-This taxonomy is fixed. No deviations without formal update.
-
----
-
-# 2. Core Attribution Framework
-
-Each UTM parameter has a single responsibility:
-
-* **utm_source** identifies the origin platform or partner.
-* **utm_medium** identifies the channel classification.
-* **utm_campaign** identifies the initiative.
-* **utm_content** identifies creative or placement detail.
-* **utm_term** identifies paid-search keywords only.
-
-UTMs are used for acquisition traffic only.
-Internal website navigation must not use UTMs.
+This structure is fixed and controlled.
 
 ---
 
-# 3. utm_medium (Fixed Vocabulary)
+# 2. Marketing Funnel Structure
 
-## Approved Medium List
+Organizational funnel groupings:
 
-* tv
-* paid-search
-* paid-social
-* paid-video
-* display
-* email
-* organic-search
-* organic-social
-* referral
-* event
-* print
+- Broadcast Media  
+- Digital and Creative  
+- Email  
+- Events  
+- Referral  
+- Offline  
 
-No additional mediums are permitted.
+These categories organize marketing efforts. Attribution is determined strictly by `utm_source` and `utm_medium`.
 
 ---
 
-# 4. utm_source (Approved List)
+# 3. Approved utm_medium List
 
-All sources must be lowercase and hyphenated. No spaces. No special characters.
+## Fixed Vocabulary
 
-## Broadcast
+- tv  
+- paid-search  
+- paid-social  
+- paid-video  
+- display  
+- email  
+- organic-search  
+- organic-social  
+- referral  
+- event  
+- print  
 
-* tv
-* tv-cleveland-3
-* tv-cleveland-5
-* tv-sarasota-13
-* tv-sarasota-8
+Rules:
 
-### Example
-
-tv-cleveland-3 + tv
-`utm_source=tv-cleveland-3`
-`utm_medium=tv`
-
----
-
-## Paid Digital
-
-* google
-* facebook
-* instagram
-* linkedin
-* x
-* tiktok
-* youtube
-
-### Examples
-
-Google Search Ad
-`utm_source=google`
-`utm_medium=paid-search`
-`utm_campaign=2026-retirement-income`
-`utm_term=retirement-income-planning`
-
-Facebook Ad
-`utm_source=facebook`
-`utm_medium=paid-social`
-`utm_campaign=2026-social-security-education`
-`utm_content=version-a`
-
-YouTube Ad
-`utm_source=youtube`
-`utm_medium=paid-video`
-`utm_campaign=2026-brand-awareness`
-`utm_content=30-second-spot`
-
-Google Display
-`utm_source=google`
-`utm_medium=display`
-`utm_campaign=q2-2026-income-education`
+- No additional mediums permitted  
+- No renaming existing mediums  
+- If a tactic does not clearly fit, it must map to the closest approved medium  
+- Medium must never describe creative format, audience, or campaign theme  
 
 ---
 
-## Email Marketing
+# 4. Approved utm_source List & Medium Mapping
 
-* ascend360-insider
-* email-drip
+All sources must be:
 
-### Example
+- lowercase  
+- hyphen separated  
+- no spaces  
+- no special characters  
+- stable year over year  
 
-Newsletter
-`utm_source=ascend360-insider`
-`utm_medium=email`
-`utm_campaign=2026-tax-planning-promo`
-`utm_content=email-header`
+---
 
-Drip Email
-`utm_source=email-drip`
-`utm_medium=email`
-`utm_campaign=q1-2026-retirement-income`
-`utm_content=email-body`
+## Broadcast Media
+
+Sources:
+
+- tv  
+- tv-cleveland-3  
+- tv-cleveland-5  
+- tv-sarasota-13  
+- tv-sarasota-8  
+
+Allowed Medium:
+
+- tv  
+
+---
+
+## Digital and Creative
+
+Sources:
+
+- google  
+- facebook  
+- instagram  
+- linkedin  
+- x  
+- tiktok  
+- youtube  
+
+Medium Mapping:
+
+google  
+- paid-search  
+- display  
+- organic-search  
+
+facebook  
+- paid-social  
+- organic-social  
+
+instagram  
+- paid-social  
+- organic-social  
+
+linkedin  
+- paid-social  
+- organic-social  
+
+x  
+- paid-social  
+- organic-social  
+
+tiktok  
+- paid-social  
+- organic-social  
+
+youtube  
+- paid-video  
+- organic-social  
+
+---
+
+## Email
+
+Sources:
+
+- ascend360-insider  
+- email-drip  
+
+Allowed Medium:
+
+- email  
 
 ---
 
 ## Events
 
-* empower-university
-* dinner-seminar
-* lunch-seminar
-* movie-event
-* tax-seminar
-* webinar
+Sources:
 
-All event sources use:
+- empower-university  
+- dinner-seminar  
+- lunch-seminar  
+- movie-event  
+- tax-seminar  
+- webinar  
 
-`utm_medium=event`
+Allowed Medium:
 
-### Examples
-
-Dinner Seminar
-`utm_source=dinner-seminar`
-`utm_medium=event`
-`utm_campaign=fall-2026-retirement-income`
-`utm_content=invitation-postcard`
-
-Webinar
-`utm_source=webinar`
-`utm_medium=event`
-`utm_campaign=2026-social-security-education`
-`utm_content=email-invite`
-
-Empower University
-`utm_source=empower-university`
-`utm_medium=event`
-`utm_campaign=q2-2026-income-series`
+- event  
 
 ---
 
 ## Referral
 
-* genesis-accounting
-* wrobel-and-associates
-* mmg-client
-* direct-referral
-* staff-family-relative
-* referral-event
+Sources:
 
-All referral sources use:
+- genesis-accounting  
+- wrobel-and-associates  
+- mmg-client  
+- direct-referral  
+- staff-family-relative  
+- referral-event  
 
-`utm_medium=referral`
+Allowed Medium:
 
-### Examples
+- referral  
 
-CPA Referral
-`utm_source=genesis-accounting`
-`utm_medium=referral`
-`utm_campaign=2026-referral-growth`
-
-Direct Client Referral
-`utm_source=direct-referral`
-`utm_medium=referral`
-`utm_campaign=2026-client-referrals`
-
-Referral Event
-`utm_source=referral-event`
-`utm_medium=referral`
-`utm_campaign=2026-client-appreciation`
-
-Individual referring person must be tracked in Salesforce, not in UTMs.
+Referral individual names must be stored in Salesforce, not in UTMs.
 
 ---
 
 ## Offline
 
-* direct-mail
-* print-ad
-* brochure
-* event-materials
-* business-card
+Sources:
 
-### Medium Mapping
+- direct-mail  
+- print-ad  
+- brochure  
+- event-materials  
+- business-card  
 
-* direct-mail → print
-* print-ad → print
-* brochure → print
-* business-card → print
-* event-materials → event
+Medium Mapping:
 
-### Examples
+direct-mail → print  
+print-ad → print  
+brochure → print  
+business-card → print  
+event-materials → event  
 
-Direct Mail
-`utm_source=direct-mail`
-`utm_medium=print`
-`utm_campaign=2026-income-planning`
-`utm_content=postcard-version-a`
-
-Brochure QR
-`utm_source=brochure`
-`utm_medium=print`
-`utm_campaign=2026-retirement-income`
-`utm_content=brochure-qr`
-
-Event Table QR
-`utm_source=event-materials`
-`utm_medium=event`
-`utm_campaign=fall-2026-dinner-seminar`
-`utm_content=event-table-qr`
-
-Business Card QR
-`utm_source=business-card`
-`utm_medium=print`
-`utm_campaign=2026-brand-awareness`
-`utm_content=qr-code`
-
-QR is recorded in utm_content, not utm_medium.
+QR identification belongs in `utm_content`, not `utm_medium`.
 
 ---
 
-# 5. utm_campaign Naming Standards
+# 5. utm_campaign Naming Convention
 
-## Structure
+Required Structure:
 
-`[timeframe]-[initiative]-[topic]`
+[timeframe]-[initiative]-[topic]
+
+Timeframe formats allowed:
+
+- q1-2026  
+- q2-2026  
+- q3-2026  
+- q4-2026  
+- 2026  
+- spring-2026  
+- fall-2026  
 
 Rules:
 
-* lowercase only
-* hyphen separated
-* no spaces
-* must describe strategy, not channel
+- lowercase only  
+- hyphen separated  
+- must describe strategic initiative  
+- must not include platform names  
+- must not include medium names  
+- must not include creative format  
+- must not include audience targeting  
 
-### Approved Examples
-
-* q1-2026-retirement-income
-* 2026-tax-planning-promo
-* fall-2026-dinner-seminar
-* 2026-rmd-education
-* q3-2026-social-security
-
-### Not Allowed
-
-* facebook-campaign
-* google-ads
-* email-blast
-* test1
-
-Campaign defines the initiative, not the platform.
+Campaign represents the marketing initiative, not distribution channel.
 
 ---
 
-# 6. utm_content Standards
+# 6. utm_content Naming Convention
 
-Used for:
+Used strictly for:
 
-* creative type
-* placement
-* variant
-* format length
-* QR placement
+- creative type  
+- placement  
+- variant  
+- format length  
+- QR identifier  
 
-## Approved Examples
+Construction pattern:
 
-* primary-cta-button
-* benefits-cta-button
-* features-cta-button
-* final-cta-button
-* hero-banner
-* sidebar-cta
-* email-header
-* email-footer
-* email-body
-* version-a
-* version-b
-* carousel-ad
-* single-image
-* video-ad
-* testimonial-creative
-* offer-creative
-* educational-creative
-* top-banner
-* bottom-banner
-* exit-intent
-* results-page
-* homepage
-* landing-page
-* thank-you-page
-* 30-second-spot
-* 60-second-spot
-* print-full-page
-* print-half-page
-* front-panel
-* back-panel
-* brochure-qr
-* event-table-qr
-* business-card-qr
+- placement-descriptor  
+- asset-variant  
+
+Rules:
+
+- lowercase only  
+- hyphen separated  
+- must not duplicate campaign name  
+- must not describe channel or medium  
+- must not include timeframe  
 
 ---
 
-# 7. utm_term Standards
+# 7. utm_term Naming Convention
 
-Used only for paid-search campaigns.
+Used only for paid-search.
 
-Must represent keyword or audience target.
+Rules:
 
-## Examples
+- lowercase only  
+- hyphen separated  
+- must reflect keyword intent  
+- must not be used for social, email, referral, event, or print  
 
-* retirement-income-planning
-* can-i-retire-with-700k
-* rmd-rules-2026
-* ohio-financial-advisor
-
-Not used for social, email, print, referral, or event.
+If not paid-search, utm_term must remain blank.
 
 ---
 
-# 8. Governance Rules
+# 8. Global Naming Rules
 
-1. No new mediums without formal approval.
-2. No freeform source entries.
-3. Campaign names must follow approved structure.
-4. UTMs must not be used for internal website navigation.
-5. Individual referral names belong in Salesforce fields, not UTMs.
-6. Salesforce API field names must match UTM parameters exactly.
+Applies to all UTM parameters.
+
+- lowercase only  
+- hyphen separated  
+- no spaces  
+- no underscores  
+- no special characters  
+- no trailing hyphens  
+- no double hyphens  
+- no unapproved abbreviations  
+- no year added to source  
+- no campaign theme added to source  
+
+All entries must pass format validation before link generation.
 
 ---
 
-# 9. Summary Structure
+# 9. Governance & Enforcement
 
-Medium defines channel classification.
-Source defines origin platform or partner.
-Campaign defines initiative.
-Content defines execution detail.
-Term defines keyword when applicable.
+1. Only approved dropdown selections allowed for source and medium.  
+2. Campaign field must follow required structure.  
+3. Content field must pass format validation.  
+4. No manual UTM construction outside the official link builder.  
+5. Quarterly audit of UTM values in CRM.  
+6. New sources require documented approval before addition.  
+7. UTMs must not be used for internal website navigation.  
+8. CRM tracks individuals; UTMs track marketing channels.  
+
+This taxonomy is production-ready, scalable, and controlled.
